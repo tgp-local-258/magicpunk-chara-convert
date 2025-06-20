@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>非公式 マジックパンクTRPG ユドナリウム駒変換</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="./js/jszip.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="./css/style.css">
+</head>
+<body>
+
+    <div class="main" id="app">
+        <div class="container">
+            <h1>マジックパンクTRPG用ユドナリウムのキャラ駒変換</h1>
+            <p>マジックパンクTRPG公式サイトのキャラクター作成シートのコマ出力ボタンからユドナリウムで使えるコマを生成します。</p>
+            <a href="https://takuge-labo.com/magicpunk/character-sheet/index.html">マジックパンクTRPG キャラクターシート</a>
+        
+            <div class="cp_iptxt">
+                <textarea name="example1" cols="80" rows="10" placeholder="ここに貼り付け" v-model="charadata"></textarea>
+            </div>
+            <!-- JSONアップロード -->
+            <input
+            type="file"
+            ref="fileInput"
+            style="display: none"
+            accept=".json"
+            @change="handleFileUpload"
+            />
+            <button @click="triggerFileInput" class="upload">JSONアップロード</button>
+            <button @click="Download" class="convert">ユドナリウム駒出力</button>
+            <button @click="clear" class="clear">クリア</button>
+
+            <h2>▼ 使い方</h2>
+            <ul>
+                <li>1.　公式サイトのキャラクターシートでコマ出力ボタンを押す</li>
+                <li>2.　ここに貼り付けと書かれたテキストエリアに張り付ける</li>
+                <li>3.　ユドナリウム駒出力ボタンを押す</li>
+                <li>4.　ユドナリウム用のキャラデータ(キャラクター名のzipファイル)がダウンロードされます</li>
+                <li>5.　ダウンロードしたzipファイルをユドナリウムにドラッグ＆ドロップ</li>
+            </ul>
+            <h2>▼ ユドナリウム側の設定</h2>
+            <ul>
+                <li>
+                    インベントリの表示項目を以下の内容で設定します。<br>HP アーマー バリア 対応数 ダイス修正
+                </li>
+            </ul>
+                        <h2>▼ ご利用にあたって</h2>
+            <p>
+                本ツールは
+                <a href="https://takuge-labo.com/magicpunk/">マジックパンクTRPG</a>
+                の非公式ファンメイドツールです。<br>
+                公式キャラクターシートで生成されたJSONデータを元に、
+                <a href="https://udonarium.app/">ユドナリウム</a>
+                で使用可能なキャラクター駒形式（XML）に変換します。<br>
+                使用にあたっては
+                <a href="https://takuge-labo.com/magicpunk/guidelines/index.html" target="_blank">公式ガイドライン</a>
+                を遵守してください。
+            </p>
+            <p style="font-size: 90%; color: #666;">
+                本作は「千葉直貴／卓ゲらぼ」が権利を有する『マジックパンクTRPG』の二次創作物です。<br>
+                Ⓒ千葉直貴／卓ゲらぼ<br>
+                ※原作および関連する著作物の権利はすべて「卓ゲらぼ」様に帰属します。<br>
+                ※本ツールは非商用・個人利用を前提としています。
+            </p>
+        </div>
+    </div>
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data: {
+                charadata: '',
+                sheet_url: '',
+            },
+            methods: {
+                triggerFileInput: function () {
+                    this.$refs.fileInput.click();  // input[type="file"] をクリック
+                },
+                handleFileUpload: function (event) {
+                    const file = event.target.files[0];
+                    if (!file || file.type !== "application/json") {
+                        alert("JSONファイルを選択してください");
+                        return;
+                    }
+
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        try {
+                            const parsed = JSON.parse(e.target.result);
+                            this.charadata = JSON.stringify(parsed, null, 2);  // 整形してテキストエリアに反映
+                        } catch (err) {
+                            alert("JSONの読み込みに失敗しました: " + err.message);
+                        }
+                    };
+                    reader.readAsText(file);
+                },
+                Download: function(){
+
+                    let charadatas = JSON.parse(this.charadata);
+
+                    //名前
+                    let name = charadatas.data.name;
+                    //HP
+                    let hp_lab = charadatas.data.status[0].label;
+                    let hp_val = charadatas.data.status[0].max;
+                    //アーマー
+                    let armor_lab = charadatas.data.status[1].label;
+                    let armor_val = charadatas.data.status[1].max;
+                    //バリア
+                    let barrier_lab = charadatas.data.status[2].label;
+                    let barrier_val = charadatas.data.status[2].max;                    
+                    //対応数
+                    let sup_of_num_lab = charadatas.data.status[3].label;
+                    let sup_of_num_val = charadatas.data.status[3].max; 
+                    //ダイス修正
+                    let dice_lab = charadatas.data.status[4].label;
+                    let dice_val = charadatas.data.status[4].max;
+
+                    //params
+                    
+                    //能力値
+                    //身体
+                    let strength_lab = charadatas.data.params[0].label;
+                    let strength_val = charadatas.data.params[0].value;
+                    //感覚
+                    let sense_lab = charadatas.data.params[1].label;
+                    let sense_val = charadatas.data.params[1].value;
+                    //知性 
+                    let intelligence_lab = charadatas.data.params[2].label;
+                    let intelligence_val = charadatas.data.params[2].value;
+                    //魔力
+                    let magic_lab = charadatas.data.params[3].label;
+                    let magic_val = charadatas.data.params[3].value;
+
+                    //荷重値
+                    let weight_lab = charadatas.data.params[4].label;
+                    let weight_val = charadatas.data.params[4].value;
+
+                    //移動値
+                    let move_lab = charadatas.data.params[5].label;
+                    let move_val = charadatas.data.params[5].value;
+
+                    //対応値
+                    let support_lab = charadatas.data.params[6].label;
+                    let support_val = charadatas.data.params[6].value;
+
+                    //社会値
+                    let society_lab = charadatas.data.params[7].label;
+                    let society_val = charadatas.data.params[7].value;
+
+                    //内包値
+                    let inclusion_lab = charadatas.data.params[8].label;
+                    let inclusion_val = charadatas.data.params[8].value;
+
+                    //手札上限
+                    let hand_limit_lab = charadatas.data.params[9].label;
+                    let hand_limit_val = charadatas.data.params[9].value;
+
+                    //魔煌集束
+                    let focus_lab = charadatas.data.params[10].label;
+                    let focus_val = charadatas.data.params[10].value;
+
+                    //軽荷
+                    let light_load_lab = charadatas.data.params[11].label;
+                    let light_load_val = charadatas.data.params[11].value;
+                    //中荷
+                    let middle_load_lab = charadatas.data.params[12].label;
+                    let middle_load_val = charadatas.data.params[12].value;
+                    //重荷
+                    let heavy_load_lab = charadatas.data.params[13].label;
+                    let heavy_load_val = charadatas.data.params[13].value;
+
+                    //チャパレ
+                    let dicebot = this.sanitizeXML(charadatas.data.commands);
+
+                    let data = `<?xml version="1.0" encoding="UTF-8"?>`;
+                    data += `<character location.name="table" location.x="75" location.y="325" posZ="0" rotate="0" roll="0">`;
+                    data += `<data name="character">`;
+                    data += `<data name="image"><data type="image" name="imageIdentifier">null</data></data><data name="common">`;
+                    data += `<data name="name">${name}</data><data name="size">2</data></data>`
+                    data += `<data name="detail"><data name="リソース">`
+                    data += `<data type="numberResource" currentValue="${hp_val}" name="${hp_lab}">${hp_val}</data>`
+                    data += `<data type="numberResource" currentValue="${armor_val}" name="${armor_lab}">${armor_val}</data>`
+                    data += `<data type="numberResource" currentValue="${barrier_val}" name="${barrier_lab}">${barrier_val}</data>`
+                    data += `<data type="numberResource" currentValue="${sup_of_num_val}" name="${sup_of_num_lab}">${sup_of_num_val}</data>`
+                    data += `<data type="numberResource" currentValue="${dice_val}" name="${dice_lab}">${dice_val}</data>`
+                    data += `</data>`
+                    data += `<data name="パラメータ">`
+                    data += `<data name="${strength_lab}">${strength_val}</data>`
+                    data += `<data name="${sense_lab}">${sense_val}</data>`
+                    data += `<data name="${intelligence_lab}">${intelligence_val}</data>`
+                    data += `<data name="${magic_lab}">${magic_val}</data>`
+                    data += `<data name="${weight_lab}">${weight_val}</data>`
+                    data += `<data name="${move_lab}">${move_val}</data>`
+                    data += `<data name="${support_lab}">${support_val}</data>`
+                    data += `<data name="${society_lab}">${society_val}</data>`
+                    data += `<data name="${inclusion_lab}">${inclusion_val}</data>`
+                    data += `<data name="${hand_limit_lab}">${hand_limit_val}</data>`
+                    data += `<data name="${focus_lab}">${focus_val}</data>`
+                    data += `<data name="${light_load_lab}">${light_load_val}</data>`
+                    data += `<data name="${middle_load_lab}">${middle_load_val}</data>`
+                    data += `<data name="${heavy_load_lab}">${heavy_load_val}</data>`
+                    data += `</data></data></data>`
+                    data += `<chat-palette dicebot="">${dicebot}</chat-palette></character>`
+                    
+
+                    const filename = 'data.xml';
+
+                    var zip = new JSZip();
+                    zip.file(filename, data); // テキストファイルの追加
+                    zip.generateAsync({type:'blob'})
+                    .then(function(content) {
+                        const url = (window.URL || window.webkitURL).createObjectURL(content);
+                        const download = document.createElement('a');
+                        download.href = url;
+                        download.download = `xml_${name}.zip`;
+                        download.click();
+                        (window.URL || window.webkitURL).revokeObjectURL(url);
+                    });
+                },
+                sanitizeXML: function (str) {
+                    return str
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;')
+                        .replace(/"/g, '&quot;')
+                        .replace(/'/g, '&apos;');
+                },
+                clear: function(){
+                    this.charadata = '';
+                }
+            }
+        })
+    </script>
+</body>
+</html>
