@@ -42,7 +42,7 @@
             <h2>▼ ユドナリウム側の設定</h2>
             <ul>
                 <li>
-                    インベントリの表示項目を以下の内容で設定します。<br>HP アーマー バリア 対応数 ダイス修正
+                    インベントリの表示項目を以下の内容で設定します。<br>HP アーマー バリア 対応数 ダイス修正 行動値
                 </li>
             </ul>
                         <h2>▼ ご利用にあたって</h2>
@@ -184,6 +184,7 @@
                     data += `<data type="numberResource" currentValue="${barrier_val}" name="${barrier_lab}">${barrier_val}</data>`
                     data += `<data type="numberResource" currentValue="${sup_of_num_val}" name="${sup_of_num_lab}">${sup_of_num_val}</data>`
                     data += `<data type="numberResource" currentValue="${dice_val}" name="${dice_lab}">${dice_val}</data>`
+                    data += `<data type="numberResource" currentValue="0" name="行動値">0</data>`
                     data += `</data>`
                     data += `<data name="パラメータ">`
                     data += `<data name="${strength_lab}">${strength_val}</data>`
