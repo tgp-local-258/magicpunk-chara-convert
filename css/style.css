@@ -1,18 +1,87 @@
 body {
-	color: #333333;
-	font-size: 100%;
-	font-family: "ヒラギノ角ゴ ProN W3", "Hiragino Kaku Gothic ProN",verdana,"メイリオ", Meiryo, sans-serif;
-	line-height: 1.5;
-	background: url(null) fixed;
-	background-color: #fff;
+    font-family: "M PLUS Rounded 1c", sans-serif;
+    background-color: #1a1a1e;
+    color: #e0e0e0;
+    margin: 0;
+    padding: 0;
 }
-html {
-	overflow-y: scroll;
-}
-ul, ol {
-	list-style: none;
-}
+
 .container {
-    width: 90%;
-    margin: 50px auto;
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: #26262b;
+    border: 1px solid #3a3a3f;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+}
+
+h1 {
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+    color: #f5a9a9; /* 明るめの赤系 */
+}
+
+h2 {
+    font-size: 1.2rem;
+    color: #aaaaaa;
+    margin-top: 2rem;
+}
+
+.cp_iptxt textarea {
+    width: 100%;
+    font-family: monospace;
+    font-size: 14px;
+    padding: 1rem;
+    border: 1px solid #555;
+    border-radius: 6px;
+    background-color: #1e1e22;
+    color: #e0e0e0;
+    box-sizing: border-box;
+}
+
+/* ボタン共通 */
+button {
+    font-family: inherit;
+    font-size: 1rem;
+    padding: 0.6rem 1.2rem;
+    margin: 0.4rem 0.4rem 1rem 0;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* ボタン種別 */
+button.upload {
+    background-color: #b85c5c;
+    color: #fff;
+}
+button.convert {
+    background-color: #5c7fb8;
+    color: #fff;
+}
+button.clear {
+    background-color: #666;
+    color: #f0f0f0;
+}
+button:hover {
+    filter: brightness(1.1);
+}
+
+/* リンク */
+a {
+    color: #f08a8a;
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+
+/* 小さな注意文 */
+.container p[style] {
+    margin-top: 1.5rem;
+    line-height: 1.4;
+    color: #bbbbbb;
 }
